@@ -2,9 +2,9 @@ const timeData = [
     {
         id: 1,
         time: '9:00am - 10:00am',
-        firstName: "",
-        lastName: "",
-        phone: "",
+        firstName: "Jrew",
+        lastName: "Mohamed",
+        phone: "1231231234",
         submitted: false
     },
     {

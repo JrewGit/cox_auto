@@ -10,7 +10,6 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import Modal from '@material-ui/core/Modal';
-import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 
 
@@ -58,9 +57,9 @@ class Test extends Component {
         this.state = {
             data: timeData,
             open: false,
-            // firstName: "",
-            // lastName: "",
-            // phone: "",
+            firstName: "",
+            lastName: "",
+            phone: "",
             timeId: 0
         }
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -70,12 +69,14 @@ class Test extends Component {
     handleOpen = (id) => {
         this.setState(prevState => { 
             const updatedData = prevState.data.map(data => {
-                if (data.submitted === true) {
-                    // this.resetTextFields()
-                    console.log(data.submitted)
-                } return data
+                if ((data.id === prevState.timeId) && (data.submitted === false)) {
+                    prevState.firstName = ''
+                    prevState.lastName = ''
+                    prevState.phone = ''
+                }
+                return data
             })
-            console.log(this.state.data)
+            // console.log(this.state.data)
             return {
                 data: updatedData,
                 open: true,
@@ -87,11 +88,11 @@ class Test extends Component {
     handleSubmit(event) {
         event.preventDefault();
         this.setState(prevState => {
-            const updatedData = this.state.data.map(data => {
-                if (data.id === this.state.timeId) {
-                    data.firstName = this.state.firstName
-                    data.lastName = this.state.lastName
-                    data.phone = this.state.phone
+            const updatedData = prevState.data.map(data => {
+                if (data.id === prevState.timeId) {
+                    data.firstName = prevState.firstName
+                    data.lastName = prevState.lastName
+                    data.phone = prevState.phone
                     data.submitted = true
                 } return data
             })
@@ -104,11 +105,18 @@ class Test extends Component {
     }
 
     resetTextFields = () => {
-        this.setState({
-            firstName : '', 
-            lastName: '',
-            phone: ''
-        });
+        this.setState(prevState => {
+            const updatedData = prevState.data.map(data => {
+                if (data.submitted === false) {
+                    prevState.firstName = ''
+                    prevState.lastName = ''
+                    prevState.phone = ''
+                } return data
+            })
+            return {
+                data: updatedData
+            }
+        })
     }
 
     handleClose = (id) => {
