@@ -9,6 +9,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
+import Modal from '@material-ui/core/Modal';
 
 const styles = theme => ({
     tableTitle: {
@@ -21,6 +22,15 @@ const styles = theme => ({
         margin: 'auto',
         overflowX: 'auto',
     },
+    modalStyle: {
+        width: theme.spacing.unit * 50,
+        backgroundColor: theme.palette.background.paper,
+        boxShadow: theme.shadows[5],
+        padding: theme.spacing.unit * 4,
+        outline: 'none',
+        marginTop: '40vh',
+        margin: 'auto'
+    }
 });
 
 class Test extends Component {
@@ -28,14 +38,23 @@ class Test extends Component {
     constructor() {
         super()
         this.state = {
-            data: timeData
+            data: timeData,
+            open: false
         }
-        this.clickHandler = this.clickHandler.bind(this)
+        // this.clickHandler = this.clickHandler.bind(this)
     }
 
-    clickHandler(id) {
-        console.log(id)
-    }
+    // clickHandler(id) {
+    //     // console.log(id)
+    // }
+
+    handleOpen = (id) => {
+        this.setState({ open: true });
+    };
+
+    handleClose = () => {
+        this.setState({ open: false });
+    };
 
     render() {
 
@@ -45,7 +64,7 @@ class Test extends Component {
             <div>
                 <Typography variant="h5" className={classes.tableTitle}>
                     Please choose from the following time slots:
-            </Typography>
+                </Typography>
                 <Paper className={classes.root}>
                     <Table className={classes.table}>
                         <TableHead>
@@ -55,13 +74,29 @@ class Test extends Component {
                         </TableHead>
                         <TableBody>
                             {this.state.data.map(times => (
-                                <TableRow key={times.id} onClick={()=> this.clickHandler(times.id)} hover>
+                                <TableRow key={times.id} onClick={() => this.handleOpen(times.id)} hover>
                                     <TableCell component="th" scope="row" align="center">{times.time}</TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
                     </Table>
                 </Paper>
+                <Modal
+                    aria-labelledby="simple-modal-title"
+                    aria-describedby="simple-modal-description"
+                    open={this.state.open}
+                    onClose={this.handleClose}
+                >
+                    <div className={classes.modalStyle}>
+                        <Typography variant="h6" id="modal-title">
+                            Text in a modal
+                        </Typography>
+                        <Typography variant="subtitle1" id="simple-modal-description">
+                            Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
+                        </Typography>
+                        {/* <SimpleModalWrapped /> */}
+                    </div>
+                </Modal>
             </div>
         );
     }
