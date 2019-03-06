@@ -10,6 +10,10 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import Modal from '@material-ui/core/Modal';
+import Button from '@material-ui/core/Button';
+import FormLabel from '@material-ui/core/FormLabel';
+import TextField from '@material-ui/core/TextField';
+
 
 const styles = theme => ({
     tableTitle: {
@@ -30,7 +34,22 @@ const styles = theme => ({
         outline: 'none',
         marginTop: '40vh',
         margin: 'auto'
-    }
+    },
+    container: {
+        display: 'flex',
+        flexWrap: 'wrap',
+    },
+    textField: {
+        marginLeft: theme.spacing.unit,
+        marginRight: theme.spacing.unit,
+        width: '100%',
+    },
+    dense: {
+        marginTop: 19,
+    },
+    menu: {
+        width: 200,
+    },
 });
 
 class Test extends Component {
@@ -39,7 +58,10 @@ class Test extends Component {
         super()
         this.state = {
             data: timeData,
-            open: false
+            open: false,
+            firstName: "",
+            lastName: "",
+            phoneNumber: ""
         }
         // this.clickHandler = this.clickHandler.bind(this)
     }
@@ -49,16 +71,40 @@ class Test extends Component {
     // }
 
     handleOpen = (id) => {
-        this.setState({ open: true });
+        this.setState({ open: true, });
+        // console.log(id)
     };
 
-    handleClose = () => {
+    handleClose = (id) => {
         this.setState({ open: false });
+        // console.log("closed")
     };
+
+    handleChange = name => event => {
+        this.setState({ [name]: event.target.value });
+    };
+
+    submitHandle = (id) => {
+        console.log(id);
+        // this.setState(prevState => {
+        //     const updatedData = prevState.data.map(times => {
+        //         if (times.id === id) {
+        //             times.submitted = true;
+        //         } return times;
+        //     }) 
+
+        //     return {
+        //         data: updatedData
+        //     }
+        // })
+    }
 
     render() {
 
         const { classes } = this.props;
+        const submittedStyle = {
+            backgroundColor: "red"
+        }
 
         return (
             <div>
@@ -74,8 +120,8 @@ class Test extends Component {
                         </TableHead>
                         <TableBody>
                             {this.state.data.map(times => (
-                                <TableRow key={times.id} onClick={() => this.handleOpen(times.id)} hover>
-                                    <TableCell component="th" scope="row" align="center">{times.time}</TableCell>
+                                <TableRow key={times.id} onClick={() => this.handleOpen(times.id)} hover style={{cursor: "pointer"}}>
+                                    <TableCell component="th" scope="row" align="center" style={times.submitted ? submittedStyle : null}>{times.time}</TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
@@ -87,14 +133,42 @@ class Test extends Component {
                     open={this.state.open}
                     onClose={this.handleClose}
                 >
-                    <div className={classes.modalStyle}>
-                        <Typography variant="h6" id="modal-title">
-                            Text in a modal
-                        </Typography>
-                        <Typography variant="subtitle1" id="simple-modal-description">
-                            Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
-                        </Typography>
-                        {/* <SimpleModalWrapped /> */}
+                    <div className={classes.modalStyle}>                      
+                        <form className={classes.container} noValidate autoComplete="off">
+                            <Typography variant="h6" className={classes.tableTitle}>
+                                Please enter the following information:
+                            </Typography>
+                            <TextField
+                                id="standard-name"
+                                label="First Name"
+                                className={classes.textField}
+                                value={this.state.firstName}
+                                onChange={this.handleChange('firstName')}
+                                margin="normal"
+                                // name="firstName"
+                            />
+                            <TextField
+                                id="standard-name"
+                                label="Last Name"
+                                className={classes.textField}
+                                value={this.state.lastName}
+                                onChange={this.handleChange('lastName')}
+                                margin="normal"
+                                // name="lastName"
+                            />
+                            <TextField
+                                id="standard-name"
+                                label="Phone"
+                                className={classes.textField}
+                                value={this.state.phone}
+                                onChange={this.handleChange('phoneNumber')}
+                                margin="normal"
+                                // name="phone"
+                            />
+                            <Button variant="outlined" color="primary" fullWidth={true} onClick={() => this.submitHandle(this.state.data)}>
+                                Submit
+                            </Button>
+                        </form>
                     </div>
                 </Modal>
             </div>
