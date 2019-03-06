@@ -58,21 +58,58 @@ class Test extends Component {
         this.state = {
             data: timeData,
             open: false,
-            firstName: "",
-            lastName: "",
-            phone: "",
+            // firstName: "",
+            // lastName: "",
+            // phone: "",
             timeId: 0
         }
+        this.handleSubmit = this.handleSubmit.bind(this);
     }
 
+    //Working on clearing text fields
     handleOpen = (id) => {
-        this.setState(prevState => {
+        this.setState(prevState => { 
+            const updatedData = prevState.data.map(data => {
+                if (data.submitted === true) {
+                    // this.resetTextFields()
+                    console.log(data.submitted)
+                } return data
+            })
+            console.log(this.state.data)
             return {
+                data: updatedData,
                 open: true,
                 timeId: id
             }
         })
     };
+
+    handleSubmit(event) {
+        event.preventDefault();
+        this.setState(prevState => {
+            const updatedData = this.state.data.map(data => {
+                if (data.id === this.state.timeId) {
+                    data.firstName = this.state.firstName
+                    data.lastName = this.state.lastName
+                    data.phone = this.state.phone
+                    data.submitted = true
+                } return data
+            })
+            return {
+                data: updatedData,
+                open: false,
+            }
+        })
+        console.log(this.state.data)
+    }
+
+    resetTextFields = () => {
+        this.setState({
+            firstName : '', 
+            lastName: '',
+            phone: ''
+        });
+    }
 
     handleClose = (id) => {
         this.setState({ open: false });
@@ -81,22 +118,6 @@ class Test extends Component {
     handleChange = name => event => {
         this.setState({ [name]: event.target.value });
     };
-
-    submitHandle = () => {
-        this.setState(prevState => {
-            const updatedData = prevState.data.map(times => {
-                if (times.id === this.state.timeId) {
-                    times.submitted = true;
-                } return times;
-            }) 
-
-            return {
-                data: updatedData,
-                open: false,
-            }
-        })
-        console.log(this.state.timeId)
-    }
 
     render() {
 
@@ -133,40 +154,39 @@ class Test extends Component {
                     onClose={this.handleClose}
                 >
                     <div className={classes.modalStyle}>
-                        <form className={classes.container} noValidate autoComplete="off">
+                        <form className={classes.container} onSubmit={this.handleSubmit} noValidate autoComplete="off">
                             <Typography variant="h6" className={classes.tableTitle}>
                                 Please enter the following information:
                             </Typography>
                             <TextField
-                                id="standard-name"
+                                id="firstName"
                                 label="First Name"
+                                type="text"
                                 className={classes.textField}
                                 value={this.state.firstName}
                                 onChange={this.handleChange('firstName')}
                                 margin="normal"
-                            // name="firstName"
                             />
                             <TextField
-                                id="standard-name"
+                                id="lastName"
                                 label="Last Name"
                                 className={classes.textField}
                                 value={this.state.lastName}
                                 onChange={this.handleChange('lastName')}
                                 margin="normal"
-                            // name="lastName"
                             />
                             <TextField
-                                id="standard-name"
+                                id="phone"
                                 label="Phone"
                                 className={classes.textField}
                                 value={this.state.phone}
                                 onChange={this.handleChange('phone')}
                                 margin="normal"
-                            // name="phone"
                             />
-                            <Button variant="outlined" color="primary" fullWidth={true} onClick={this.submitHandle}>
+                            {/* <Button variant="outlined" color="primary" fullWidth={true} onClick={this.submitHandle}>
                                 Submit
-                            </Button>
+                            </Button> */}
+                            <input type="submit" value="Submit" />
                         </form>
                     </div>
                 </Modal>
