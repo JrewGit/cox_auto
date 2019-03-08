@@ -65,7 +65,6 @@ class Test extends Component {
         this.handleSubmit = this.handleSubmit.bind(this);
     }
  
-    //Working on clearing text fields
     handleOpen = (id) => {
         this.setState(prevState => { 
             const updatedData = prevState.data.map(data => {
@@ -73,15 +72,14 @@ class Test extends Component {
                     prevState.firstName = ''
                     prevState.lastName = ''
                     prevState.phone = ''
-                } else if ((data.id === prevState.timeId) && data.submitted === true) {
-                    // prevState.firstName = data[prevState.timeId].firstName
-                    console.log(data)
-                    // prevState.lastName = data[prevState.timeId].lastName
-                    // prevState.phone = data[prevState.timeId].phone
+                }
+                else if ((data.id === id) && data.submitted === true) {
+                    prevState.firstName = data.firstName
+                    prevState.lastName = data.lastName
+                    prevState.phone = data.phone
                 }
                 return data
             })
-            // console.log(this.state.data)
             return {
                 data: updatedData,
                 open: true,
@@ -196,9 +194,6 @@ class Test extends Component {
                                 onChange={this.handleChange('phone')}
                                 margin="normal"
                             />
-                            {/* <Button variant="outlined" color="primary" fullWidth={true} onClick={this.submitHandle}>
-                                Submit
-                            </Button> */}
                             <input type="submit" value="Submit" />
                         </form>
                     </div>
