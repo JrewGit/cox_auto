@@ -1,342 +1,210 @@
-import React from 'react';
-import classNames from 'classnames';
+import React, { Component } from 'react';
+import timeData from '../timeData';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
-import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
-import TableSortLabel from '@material-ui/core/TableSortLabel';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
-import Checkbox from '@material-ui/core/Checkbox';
-import IconButton from '@material-ui/core/IconButton';
-import Tooltip from '@material-ui/core/Tooltip';
-import DeleteIcon from '@material-ui/icons/Delete';
-import FilterListIcon from '@material-ui/icons/FilterList';
-import { lighten } from '@material-ui/core/styles/colorManipulator';
+import Typography from '@material-ui/core/Typography';
+import Modal from '@material-ui/core/Modal';
+import TextField from '@material-ui/core/TextField';
 
-let counter = 0;
-function createData(name) {
-  counter += 1;
-  return { id: counter, name };
-}
-
-function desc(a, b, orderBy) {
-  if (b[orderBy] < a[orderBy]) {
-    return -1;
-  }
-  if (b[orderBy] > a[orderBy]) {
-    return 1;
-  }
-  return 0;
-}
-
-function stableSort(array, cmp) {
-  const stabilizedThis = array.map((el, index) => [el, index]);
-  stabilizedThis.sort((a, b) => {
-    const order = cmp(a[0], b[0]);
-    if (order !== 0) return order;
-    return a[1] - b[1];
-  });
-  return stabilizedThis.map(el => el[0]);
-}
-
-function getSorting(order, orderBy) {
-  return order === 'desc' ? (a, b) => desc(a, b, orderBy) : (a, b) => -desc(a, b, orderBy);
-}
-
-const rows = [
-  { id: 'name', numeric: false, disablePadding: true, label: 'Time Slots' },
-];
-
-class MainHead extends React.Component {
-  createSortHandler = property => event => {
-    this.props.onRequestSort(event, property);
-  };
-
-  render() {
-    const { onSelectAllClick, order, orderBy, numSelected, rowCount } = this.props;
-
-    return (
-      <TableHead>
-        <TableRow>
-          <TableCell padding="checkbox">
-            <Checkbox
-              indeterminate={numSelected > 0 && numSelected < rowCount}
-              checked={numSelected === rowCount}
-              onChange={onSelectAllClick}
-            />
-          </TableCell>
-          {rows.map(
-            row => (
-              <TableCell
-                key={row.id}
-                align={row.numeric ? 'right' : 'left'}
-                padding={row.disablePadding ? 'none' : 'default'}
-                sortDirection={orderBy === row.id ? order : false}
-              >
-                <Tooltip
-                  title="Sort"
-                  placement={row.numeric ? 'bottom-end' : 'bottom-start'}
-                  enterDelay={300}
-                >
-                  <TableSortLabel
-                    active={orderBy === row.id}
-                    direction={order}
-                    onClick={this.createSortHandler(row.id)}
-                  >
-                    {row.label}
-                  </TableSortLabel>
-                </Tooltip>
-              </TableCell>
-            ),
-            this,
-          )}
-        </TableRow>
-      </TableHead>
-    );
-  }
-}
-
-MainHead.propTypes = {
-  numSelected: PropTypes.number.isRequired,
-  onRequestSort: PropTypes.func.isRequired,
-  onSelectAllClick: PropTypes.func.isRequired,
-  order: PropTypes.string.isRequired,
-  orderBy: PropTypes.string.isRequired,
-  rowCount: PropTypes.number.isRequired,
-};
-
-const toolbarStyles = theme => ({
-  root: {
-    paddingRight: theme.spacing.unit,
-  },
-  highlight:
-    theme.palette.type === 's'
-      ? {
-          color: theme.palette.secondary.main,
-          backgroundColor: lighten(theme.palette.secondary.light, 0.85),
-        }
-      : {
-          color: theme.palette.text.primary,
-          backgroundColor: theme.palette.secondary.dark,
-        },
-  spacer: {
-    flex: '1 1 100%',
-  },
-  actions: {
-    color: theme.palette.text.secondary,
-  },
-  title: {
-    flex: '0 0 auto',
-  },
-});
-
-let MainToolbar = props => {
-  const { numSelected, classes } = props;
-
-  return (
-    <Toolbar
-      className={classNames(classes.root, {
-        [classes.highlight]: numSelected > 0,
-      })}
-    >
-      <div className={classes.title}>
-        {numSelected > 0 ? (
-          <Typography color="inherit" variant="subtitle1">
-            {numSelected} selected
-          </Typography>
-        ) : (
-          <Typography variant="h6" id="tableTitle">
-            Please choose from the following time slots:
-          </Typography>
-        )}
-      </div>
-      <div className={classes.spacer} />
-      <div className={classes.actions}>
-        {numSelected > 0 ? (
-          <Tooltip title="Delete">
-            <IconButton aria-label="Delete">
-              <DeleteIcon />
-            </IconButton>
-          </Tooltip>
-        ) : (
-          <Tooltip title="Filter list">
-            <IconButton aria-label="Filter list">
-              <FilterListIcon />
-            </IconButton>
-          </Tooltip>
-        )}
-      </div>
-    </Toolbar>
-  );
-};
-
-MainToolbar.propTypes = {
-  classes: PropTypes.object.isRequired,
-  numSelected: PropTypes.number.isRequired,
-};
-
-MainToolbar = withStyles(toolbarStyles)(MainToolbar);
 
 const styles = theme => ({
-  root: {
-    width: '100%',
-    marginTop: theme.spacing.unit * 3,
-  },
-  table: {
-    minWidth: 1020,
-  },
-  tableWrapper: {
-    overflowX: 'auto',
-  },
+    tableTitle: {
+        marginTop: '5vh',
+        marginLeft: '3vh'
+    },
+    root: {
+        width: '70vw',
+        marginTop: '10vh',
+        margin: 'auto',
+        overflowX: 'auto',
+    },
+    modalStyle: {
+        width: theme.spacing.unit * 50,
+        backgroundColor: theme.palette.background.paper,
+        boxShadow: theme.shadows[5],
+        padding: theme.spacing.unit * 4,
+        outline: 'none',
+        marginTop: '25vh',
+        margin: 'auto'
+    },
+    container: {
+        display: 'flex',
+        flexWrap: 'wrap',
+    },
+    textField: {
+        marginLeft: theme.spacing.unit,
+        marginRight: theme.spacing.unit,
+        width: '100%',
+    },
+    dense: {
+        marginTop: 19,
+    },
+    menu: {
+        width: 200,
+    },
 });
 
-class Main extends React.Component {
-  state = {
-    order: 'asc',
-    orderBy: 'calories',
-    selected: [],
-    data: [
-      createData('9:00am - 10:00am'),
-      createData('10:00am - 11:00am'),
-      createData('11:00am - 12:00pm'),
-      createData('12:00pm - 1:00pm'),
-      createData('1:00pm - 2:00pm'),
-      createData('2:00pm - 3:00pm'),
-      createData('3:00pm - 4:00pm'),
-      createData('4:00pm - 5:00pm'),
-    ],
-    page: 0,
-    rowsPerPage: 10,
-  };
+class Test extends Component {
 
-  handleRequestSort = (event, property) => {
-    const orderBy = property;
-    let order = 'desc';
+    constructor() {
+        super()
+        this.state = {
+            data: timeData,
+            open: false,
+            firstName: "",
+            lastName: "",
+            phone: "",
+            timeId: 0
+        }
+        this.handleSubmit = this.handleSubmit.bind(this);
+    }
+ 
+    handleOpen = (id) => {
+        this.setState(prevState => { 
+            const updatedData = prevState.data.map(data => {
+                if ((data.id === id) && (data.submitted === false)) {
+                    prevState.firstName = ''
+                    prevState.lastName = ''
+                    prevState.phone = ''
+                }
+                else if ((data.id === id) && data.submitted === true) {
+                    prevState.firstName = data.firstName
+                    prevState.lastName = data.lastName
+                    prevState.phone = data.phone
+                }
+                return data
+            })
+            return {
+                data: updatedData,
+                open: true,
+                timeId: id
+            }
+        })
+    };
 
-    if (this.state.orderBy === property && this.state.order === 'desc') {
-      order = 'asc';
+    handleSubmit(event) {
+        event.preventDefault();
+        this.setState(prevState => {
+            const updatedData = prevState.data.map(data => {
+                if (data.id === prevState.timeId) {
+                    data.firstName = prevState.firstName
+                    data.lastName = prevState.lastName
+                    data.phone = prevState.phone
+                    data.submitted = true
+                } return data
+            })
+            return {
+                data: updatedData,
+                open: false,
+            }
+        })
+        console.log(this.state.data)
     }
 
-    this.setState({ order, orderBy });
-  };
-
-  handleSelectAllClick = event => {
-    if (event.target.checked) {
-      this.setState(state => ({ selected: state.data.map(n => n.id) }));
-      return;
-    }
-    this.setState({ selected: [] });
-  };
-
-  handleClick = (event, id) => {
-    const { selected } = this.state;
-    const selectedIndex = selected.indexOf(id);
-    let newSelected = [];
-
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, id);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1),
-      );
+    resetTextFields = () => {
+        this.setState(prevState => {
+            const updatedData = prevState.data.map(data => {
+                if (data.submitted === false) {
+                    prevState.firstName = ''
+                    prevState.lastName = ''
+                    prevState.phone = ''
+                } return data
+            })
+            return {
+                data: updatedData
+            }
+        })
     }
 
-    this.setState({ selected: newSelected });
-  };
+    handleClose = (id) => {
+        this.setState({ open: false });
+    };
 
-  handleChangePage = (event, page) => {
-    this.setState({ page });
-  };
+    handleChange = name => event => {
+        this.setState({ [name]: event.target.value });
+    };
 
-  handleChangeRowsPerPage = event => {
-    this.setState({ rowsPerPage: event.target.value });
-  };
+    render() {
 
-  isSelected = id => this.state.selected.indexOf(id) !== -1;
+        const { classes } = this.props;
+        const submittedStyle = {
+            backgroundColor: "red"
+        }
 
-  render() {
-    const { classes } = this.props;
-    const { data, order, orderBy, selected, rowsPerPage, page } = this.state;
-    const emptyRows = rowsPerPage - Math.min(rowsPerPage, data.length - page * rowsPerPage);
-
-    return (
-      <Paper className={classes.root}>
-        <MainToolbar numSelected={selected.length} />
-        <div className={classes.tableWrapper}>
-          <Table className={classes.table} aria-labelledby="tableTitle">
-            <MainHead
-              numSelected={selected.length}
-              order={order}
-              orderBy={orderBy}
-              onSelectAllClick={this.handleSelectAllClick}
-              onRequestSort={this.handleRequestSort}
-              rowCount={data.length}
-            />
-            <TableBody>
-              {stableSort(data, getSorting(order, orderBy))
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map(n => {
-                  const isSelected = this.isSelected(n.id);
-                  return (
-                    <TableRow
-                      hover
-                      onClick={event => this.handleClick(event, n.id)}
-                      role="checkbox"
-                      aria-checked={isSelected}
-                      tabIndex={-1}
-                      key={n.id}
-                      selected={isSelected}
-                    >
-                      <TableCell padding="checkbox">
-                        <Checkbox checked={isSelected} />
-                      </TableCell>
-                      <TableCell component="th" scope="row" padding="none">
-                        {n.name}
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              {emptyRows > 0 && (
-                <TableRow style={{ height: 49 * emptyRows }}>
-                  <TableCell colSpan={6} />
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-        <TablePagination
-          rowsPerPageOptions={[5, 10]}
-          component="div"
-          count={data.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          backIconButtonProps={{
-            'aria-label': 'Previous Page',
-          }}
-          nextIconButtonProps={{
-            'aria-label': 'Next Page',
-          }}
-          onChangePage={this.handleChangePage}
-          onChangeRowsPerPage={this.handleChangeRowsPerPage}
-        />
-      </Paper>
-    );
-  }
+        return (
+            <div>
+                <Typography variant="h5" className={classes.tableTitle}>
+                    Please choose from the following time slots:
+                </Typography>
+                <Paper className={classes.root}>
+                    <Table className={classes.table}>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell component="th" scope="row" align="center">Time Slots Available:</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {this.state.data.map(times => (
+                                <TableRow key={times.id} onClick={() => this.handleOpen(times.id)} hover style={{ cursor: "pointer" }}>
+                                    <TableCell component="th" scope="row" align="center" style={times.submitted ? submittedStyle : null}>{times.time}</TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </Paper>
+                <Modal
+                    aria-labelledby="simple-modal-title"
+                    aria-describedby="simple-modal-description"
+                    open={this.state.open}
+                    onClose={this.handleClose}
+                >
+                    <div className={classes.modalStyle}>
+                        <form className={classes.container} onSubmit={this.handleSubmit} noValidate autoComplete="off">
+                            <Typography variant="h6" className={classes.tableTitle}>
+                                Please enter the following information:
+                            </Typography>
+                            <TextField
+                                id="firstName"
+                                label="First Name"
+                                type="text"
+                                className={classes.textField}
+                                value={this.state.firstName}
+                                onChange={this.handleChange('firstName')}
+                                margin="normal"
+                            />
+                            <TextField
+                                id="lastName"
+                                label="Last Name"
+                                className={classes.textField}
+                                value={this.state.lastName}
+                                onChange={this.handleChange('lastName')}
+                                margin="normal"
+                            />
+                            <TextField
+                                id="phone"
+                                label="Phone"
+                                className={classes.textField}
+                                value={this.state.phone}
+                                onChange={this.handleChange('phone')}
+                                margin="normal"
+                            />
+                            <input type="submit" value="Submit" />
+                        </form>
+                    </div>
+                </Modal>
+            </div>
+        );
+    }
 }
 
-Main.propTypes = {
-  classes: PropTypes.object.isRequired,
+Test.propTypes = {
+    classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(Main);
+export default withStyles(styles)(Test);

@@ -14,7 +14,7 @@ const styles = {
     flexGrow: 1,
   },
   color: {
-    backgroundColor: "#282829"
+    backgroundColor: "#1d5286"
   },
   links: {
     textDecoration: "none",
